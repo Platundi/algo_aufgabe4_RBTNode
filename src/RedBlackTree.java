@@ -153,7 +153,7 @@ public class RedBlackTree {
         while (zNode != root && zNode.parent.color == RBTNode.red) {
             if (zNode.parent == zNode.parent.parent.left) {
                 RBTNode yNode = zNode.parent.parent.right;
-                if (yNode != nil && yNode != null && yNode.color == RBTNode.red) {
+                if (yNode.color == RBTNode.red) {
                     zNode.parent.color = RBTNode.black;
                     yNode.color = RBTNode.black;
                     zNode.parent.parent.color = RBTNode.red;
@@ -185,6 +185,7 @@ public class RedBlackTree {
                 }
             }
         }
+        root.color = RBTNode.black;
     }
 }
 
