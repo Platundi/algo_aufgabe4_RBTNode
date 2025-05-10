@@ -14,6 +14,5 @@ public class RBTNode {
         this.key = k;
         this.val = s;
         this.color = black;
-        left = right = parent = null;
     }
 }
