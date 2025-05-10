@@ -17,39 +17,30 @@ public class RedBlackTree {
         this.nil.parent = nil;
     } // Konstruktor
 
-    public void insert(int key, String val) {
-        RBTNode newNode = insert(root, key, val, nil);
-        if (newNode != nil) {
-            rbInsertFixup(newNode);  // NUR für den neuen Knoten!
-        }
-    }
+    public void insert(RBTNode node){
+        RBTNode yNode = nil;
+        RBTNode xNode = root;
 
-    private RBTNode insert(RBTNode node, int key, String val, RBTNode parent) {
-        if (node == nil) {
-            RBTNode newNode = new RBTNode(key, val);
-            newNode.left = nil;
-            newNode.right = nil;
-            newNode.parent = parent;
-
-            if (parent == nil) {
-                root = newNode;
-            } else if (key < parent.key) {
-                parent.left = newNode;
+        while (xNode != nil) {
+            yNode = xNode;
+            if (node.key < xNode.key) {
+                xNode = xNode.left;
             } else {
-                parent.right = newNode;
+                xNode = xNode.right;
             }
-            return newNode;  // Rückgabe des neuen Knotens
         }
-
-        if (key < node.key) {
-            node.left = insert(node.left, key, val, node);
-        } else if (key > node.key) {
-            node.right = insert(node.right, key, val, node);
+        node.parent = yNode;
+        if (yNode == nil) {
+            root = node;
+        } else if (node.key < yNode.key) {
+            yNode.left = node;
+        } else {
+            yNode.right = node;
         }
-
+        node.left = nil;
+        node.right = nil;
+        node.color = RBTNode.red;
         rbInsertFixup(node);
-
-        return node;
     }
 
     public String search(int key) {

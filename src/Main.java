@@ -30,7 +30,8 @@ public class Main {
         RedBlackTree rbt = new RedBlackTree();
 
         for (int i = 0; i < n; i++) {
-            rbt.insert(arr[i], arr[i] + ". Schluessel");
+
+            rbt.insert(new RBTNode(arr[i], arr[i] + ". Schluessel"));
         }
 
         System.out.println(rbt.height());
