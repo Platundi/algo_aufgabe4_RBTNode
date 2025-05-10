@@ -11,26 +11,34 @@ public class RedBlackTree {
 
     public RedBlackTree() {
         this.root = nil;
+        this.nil.color = RBTNode.black;
+        this.nil.left = nil;
+        this.nil.right = nil;
+        this.nil.parent = nil;
     } // Konstruktor
 
     public void insert(int key, String val) {
-        RBTNode zNode = insert(root, key, val, nil);
-        rbInsertFixup(zNode);
+        RBTNode newNode = insert(root, key, val, nil);
+        if (newNode != nil) {
+            rbInsertFixup(newNode);  // NUR für den neuen Knoten!
+        }
     }
 
     private RBTNode insert(RBTNode node, int key, String val, RBTNode parent) {
         if (node == nil) {
             RBTNode newNode = new RBTNode(key, val);
-            newNode.parent = parent;
             newNode.left = nil;
             newNode.right = nil;
-            newNode.color = RBTNode.red;
+            newNode.parent = parent;
 
             if (parent == nil) {
                 root = newNode;
-                root.color = RBTNode.black;
+            } else if (key < parent.key) {
+                parent.left = newNode;
+            } else {
+                parent.right = newNode;
             }
-            return newNode;
+            return newNode;  // Rückgabe des neuen Knotens
         }
 
         if (key < node.key) {
@@ -38,6 +46,8 @@ public class RedBlackTree {
         } else if (key > node.key) {
             node.right = insert(node.right, key, val, node);
         }
+
+        rbInsertFixup(node);
 
         return node;
     }
@@ -64,7 +74,9 @@ public class RedBlackTree {
     }
 
     private int height(RBTNode node) {
-        if (node == null) { node = nil; }
+        if (node == null) {
+            node = nil;
+        }
         if (node == nil)
             return 0;
         int lHeight = height(node.left);
@@ -73,9 +85,13 @@ public class RedBlackTree {
     }
 
     public boolean CheckRB() {
-        if (root == nil) { return true; }
+        if (root == nil) {
+            return true;
+        }
 
-        if (root.color != RBTNode.black) { return false; }
+        if (root.color != RBTNode.black) {
+            return false;
+        }
 
         return CheckRB(root);
     }
@@ -141,6 +157,8 @@ public class RedBlackTree {
     }
 
     private void rbInsertFixup(RBTNode zNode) {
+        if (zNode == nil || zNode == root) return;
+
         while (zNode != root && zNode.parent.color == RBTNode.red) {
             if (zNode.parent == zNode.parent.parent.left) {
                 RBTNode yNode = zNode.parent.parent.right;
@@ -160,7 +178,7 @@ public class RedBlackTree {
                 }
             } else {
                 RBTNode yNode = zNode.parent.parent.left;
-                if (yNode != nil && yNode != null && yNode.color == RBTNode.red) {
+                if (yNode.color == RBTNode.red) {
                     zNode.parent.color = RBTNode.black;
                     yNode.color = RBTNode.black;
                     zNode.parent.parent.color = RBTNode.red;

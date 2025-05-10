@@ -13,6 +13,6 @@ public class RBTNode {
     public RBTNode(int k, String s) {
         this.key = k;
         this.val = s;
-        this.color = black;
+        this.color = red;
     }
 }
