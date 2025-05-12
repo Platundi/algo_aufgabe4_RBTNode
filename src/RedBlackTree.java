@@ -113,112 +113,6 @@ public class RedBlackTree {
         return checkBlackHeight();
     }
 
-    // hilfsmethode zur bestimmung roter knoten
-    private boolean isRed(RBTNode node) {
-        if (node == nil) return false;
-        return node.color == RBTNode.red;
-    }
-
-    private void leftRotate(RBTNode xNode) {
-        if (xNode.right == nil) {
-            return;
-        }
-
-        RBTNode yNode = xNode.right;
-        xNode.right = yNode.left;
-
-        if (yNode.left != nil) {
-            yNode.left.parent = xNode;
-        }
-        yNode.parent = xNode.parent;
-
-        if (xNode.parent == nil) {
-            root = yNode;
-        } else if (xNode == xNode.parent.left) {
-            xNode.parent.left = yNode;
-        } else {
-            xNode.parent.right = yNode;
-        }
-        yNode.left = xNode;
-        xNode.parent = yNode;
-    }
-
-    private void rightRotate(RBTNode xNode) {
-        if (xNode.left == nil) {
-            return;
-        }
-
-        RBTNode yNode = xNode.left;
-        xNode.left = yNode.right;
-
-        if (yNode.right != nil) {
-            yNode.right.parent = xNode;
-        }
-        yNode.parent = xNode.parent;
-
-        if (xNode.parent == nil) {
-            root = yNode;
-        } else if (xNode == xNode.parent.right) {
-            xNode.parent.right = yNode;
-        } else {
-            xNode.parent.left = yNode;
-        }
-        yNode.right = xNode;
-        xNode.parent = yNode;
-    }
-
-    // kommentare mit claude.ai eingefügt
-    private void rbInsertFixup(RBTNode zNode) {
-        if (zNode == nil || zNode == root) return;
-
-        while (zNode != root && zNode.parent.color == RBTNode.red) {
-            if (zNode.parent == zNode.parent.parent.left) {
-                // Der Elternknoten ist der linke Kindknoten des Großelternknotens
-                RBTNode yNode = zNode.parent.parent.right;
-                if (yNode.color == RBTNode.red) {
-                    // Fall 1: Der Onkelknoten ist rot
-                    zNode.parent.color = RBTNode.black;
-                    yNode.color = RBTNode.black;
-                    zNode.parent.parent.color = RBTNode.red;
-                    zNode = zNode.parent.parent;
-                } else {
-                    // Der Onkelknoten ist schwarz
-                    if (zNode == zNode.parent.right) {
-                        // Fall 2: zNode ist rechtes Kind
-                        zNode = zNode.parent;
-                        leftRotate(zNode);
-                    }
-                    // Fall 3: zNode ist linkes Kind
-                    zNode.parent.color = RBTNode.black;
-                    zNode.parent.parent.color = RBTNode.red;
-                    rightRotate(zNode.parent.parent);
-                }
-            } else {
-                // Der Elternknoten ist der rechte Kindknoten des Großelternknotens
-                RBTNode yNode = zNode.parent.parent.left;
-                if (yNode.color == RBTNode.red) {
-                    // Fall 1: Der Onkelknoten ist rot
-                    zNode.parent.color = RBTNode.black;
-                    yNode.color = RBTNode.black;
-                    zNode.parent.parent.color = RBTNode.red;
-                    zNode = zNode.parent.parent;
-                } else {
-                    // Der Onkelknoten ist schwarz
-                    if (zNode == zNode.parent.left) {
-                        // Fall 2: zNode ist linkes Kind
-                        zNode = zNode.parent;
-                        rightRotate(zNode); // Hier ist der Fehler - sollte rightRotate sein
-                    }
-                    // Fall 3: zNode ist rechtes Kind
-                    zNode.parent.color = RBTNode.black;
-                    zNode.parent.parent.color = RBTNode.red;
-                    leftRotate(zNode.parent.parent);
-                }
-            }
-        }
-        root.color = RBTNode.black;
-    }
-
     public boolean checkBlackHeight() {
         return getBlackHeight(root) != -1;
     }
@@ -239,6 +133,103 @@ public class RedBlackTree {
         return leftBlackHeight + increment;
     }
 
+    // hilfsmethode zur bestimmung roter knoten
+    private boolean isRed(RBTNode node) {
+        if (node == nil) return false;
+        return node.color == RBTNode.red;
+    }
+
+    private void leftRotate(RBTNode node) {
+        // y wird rechter Kindknoten von x
+        RBTNode y = node.right;
+        // Verschiebe y's linkes Teilbaum nach rechts von x
+        node.right = y.left;
+        if (y.left != nil) {
+            y.left.parent = node;
+        }
+        // y übernimmt x's Elternknoten
+        y.parent = node.parent;
+        if (node.parent == nil) {
+            // y wird neue Wurzel
+            root = y;
+        } else {
+            if (node == node.parent.left) {
+                node.parent.left = y;
+            } else {
+                node.parent.right = y;
+            }
+        }
+        y.left = node;
+        node.parent = y;
+    }
+
+    private void rightRotate(RBTNode node) {
+        // x wird linker Kindknoten von y
+        RBTNode x = node.left;
+        // Verschiebe x's rechten Teilbaum nach links von y
+        node.left = x.right;
+        if (x.right != nil) {
+            x.right.parent = node;
+        }
+        // x übernimmt y's Elternknoten
+        x.parent = node.parent;
+        if (node.parent == nil) {
+            // x wird neue Wurzel
+            root = x;
+        } else {
+            if (node == node.parent.right) {
+                node.parent.right = x;
+            } else {
+                node.parent.left = x;
+            }
+        }
+        x.right = node;
+        node.parent = x;
+    }
+
+    // kommentare mit claude.ai eingefügt
+    private void rbInsertFixup(RBTNode node) {
+        while (node.parent.color == RBTNode.red) {
+            // Elternknoten ist linker Kindknoten
+            if (node.parent == node.parent.parent.left) {
+                RBTNode y = node.parent.parent.right;  // Onkel von z
+                if (y.color == RBTNode.red) {
+                    // Fall 1: Onkel rot → Recoloring
+                    node.parent.color = RBTNode.black;
+                    y.color = RBTNode.black;
+                    node.parent.parent.color = RBTNode.red;
+                    node = node.parent.parent;
+                } else {
+                    // Fall 2+3: Onkel schwarz → Rotation notwendig
+                    if (node == node.parent.right) {
+                        node = node.parent;
+                        leftRotate(node);
+                    }
+                    node.parent.color = RBTNode.black;
+                    node.parent.parent.color = RBTNode.red;
+                    rightRotate(node.parent.parent);
+                }
+            } else {
+                // Elternknoten ist rechter Kindknoten (symmetrisch)
+                RBTNode y = node.parent.parent.left;  // Onkel von z
+                if (y.color == RBTNode.red) {
+                    node.parent.color = RBTNode.black;
+                    y.color = RBTNode.black;
+                    node.parent.parent.color = RBTNode.red;
+                    node = node.parent.parent;
+                } else {
+                    if (node == node.parent.left) {
+                        node = node.parent;
+                        rightRotate(node);
+                    }
+                    node.parent.color = RBTNode.black;
+                    node.parent.parent.color = RBTNode.red;
+                    leftRotate(node.parent.parent);
+                }
+            }
+        }
+        root.color = RBTNode.black;
+    }
 
     public void hurtRBT() {
         root.color = RBTNode.red;

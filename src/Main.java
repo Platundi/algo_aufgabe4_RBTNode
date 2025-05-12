@@ -36,7 +36,8 @@ public class Main {
 
         System.out.println(rbt1.height());
         System.out.println(rbt1.CheckRB());
-        rbt1.hurtRBT();
+        /*rbt1.hurtRBT();*/
+        rbt1.hurtRBTChangeColors(999);
         System.out.println(rbt1.CheckRB());
 
         RedBlackTree rbt2 = new RedBlackTree();
