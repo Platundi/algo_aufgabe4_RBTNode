@@ -1,6 +1,7 @@
 /* Quellen:
  * https://www.geeksforgeeks.org/shuffle-a-given-array-using-fisher-yates-shuffle-algorithm/ */
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class Main {
@@ -27,14 +28,23 @@ public class Main {
     public static void main(String[] args) {
         int n = 10000;
         int[] arr = randperm(n);
-        RedBlackTree rbt = new RedBlackTree();
+        RedBlackTree rbt1 = new RedBlackTree();
 
         for (int i = 0; i < n; i++) {
-
-            rbt.insert(new RBTNode(arr[i], arr[i] + ". Schluessel"));
+            rbt1.insert(arr[i], arr[i] + ". Schluessel");
         }
 
-        System.out.println(rbt.height());
-        System.out.println(rbt.CheckRB());
+        System.out.println(rbt1.height());
+        System.out.println(rbt1.CheckRB());
+        rbt1.hurtRBT();
+        System.out.println(rbt1.CheckRB());
+
+        RedBlackTree rbt2 = new RedBlackTree();
+        Arrays.sort(arr);
+        for (int i = 0; i < n; i++) {
+            rbt2.insert(arr[i], arr[i] + ". Schluessel");
+        }
+        System.out.println(rbt2.height());
+        System.out.println(rbt2.CheckRB());
     }
 }

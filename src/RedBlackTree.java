@@ -17,39 +17,57 @@ public class RedBlackTree {
         this.nil.parent = nil;
     } // Konstruktor
 
-    public void insert(RBTNode node){
-        RBTNode yNode = nil;
-        RBTNode xNode = root;
+    public void insert(int k, String s) {
+        RBTNode z = new RBTNode(k, s);
+        z.left = nil;
+        z.right = nil;
+        z.parent = nil;
+        // Neuer Knoten ist rot
+        z.color = RBTNode.red;
 
-        while (xNode != nil) {
-            yNode = xNode;
-            if (node.key < xNode.key) {
-                xNode = xNode.left;
+        RBTNode y = nil;
+        RBTNode x = root;
+
+        // Finde Position zum Einfügen
+        while (x != nil) {
+            y = x;
+            if (z.key < x.key) {
+                x = x.left;
             } else {
-                xNode = xNode.right;
+                x = x.right;
             }
         }
-        node.parent = yNode;
-        if (yNode == nil) {
-            root = node;
-        } else if (node.key < yNode.key) {
-            yNode.left = node;
+
+        z.parent = y;
+        if (y == nil) {
+            // z wird zur Wurzel, weil der Baum leer ist
+            root = z;
         } else {
-            yNode.right = node;
+            if (z.key < y.key) {
+                y.left = z;
+            } else {
+                y.right = z;
+            }
         }
-        node.left = nil;
-        node.right = nil;
-        node.color = RBTNode.red;
-        rbInsertFixup(node);
+
+        z.left = nil;
+        z.right = nil;
+        z.color = RBTNode.red;
+        rbInsertFixup(z);
     }
 
     public String search(int key) {
-        return search(root, key);
+        RBTNode result = search(root, key);
+        if(result != nil) {
+            return result.val;
+        }
+        // Wenn nicht gefunden
+        return null;
     }
 
-    private String search(RBTNode node, int key) {
+    private RBTNode search(RBTNode node, int key) {
         if (node == nil || node.key == key) {
-            return node.val;
+            return node;
         }
 
         if (key < node.key) {
@@ -65,9 +83,6 @@ public class RedBlackTree {
     }
 
     private int height(RBTNode node) {
-        if (node == null) {
-            node = nil;
-        }
         if (node == nil)
             return 0;
         int lHeight = height(node.left);
@@ -75,28 +90,33 @@ public class RedBlackTree {
         return Math.max(lHeight, rHeight) + 1;
     }
 
+     // claude.ai (Prompt: gib mir eine generelle Idee, wie ich überprüfen kann, ob ein schwarz roter baum ein schwarz roter baum ist)
     public boolean CheckRB() {
-        if (root == nil) {
-            return true;
-        }
-
-        if (root.color != RBTNode.black) {
-            return false;
-        }
-
         return CheckRB(root);
     }
 
     private boolean CheckRB(RBTNode node) {
-        if (node == nil) return true;
-
-        if (node.color == RBTNode.red) {
-            if ((node.left != nil && node.left.color == RBTNode.red) || (node.right != nil && node.right.color == RBTNode.red)) {
-                return false;
-            }
+        if (node == root && isRed(node)) {
+            return false;
         }
 
-        return CheckRB(node.left) && CheckRB(node.right);
+        if (node == nil) return true;
+
+        // Prüfen, ob es rote Knoten mit roten Kindern gibt
+        if (isRed(node) && (isRed(node.left) || isRed(node.right)))
+            return false;
+
+        // Rekursiv den linken und rechten Teilbaum überprüfen
+        if (!CheckRB(node.left) || !CheckRB(node.right))
+            return false;
+
+        return checkBlackHeight();
+    }
+
+    // hilfsmethode zur bestimmung roter knoten
+    private boolean isRed(RBTNode node) {
+        if (node == nil) return false;
+        return node.color == RBTNode.red;
     }
 
     private void leftRotate(RBTNode xNode) {
@@ -147,45 +167,90 @@ public class RedBlackTree {
         xNode.parent = yNode;
     }
 
+    // kommentare mit claude.ai eingefügt
     private void rbInsertFixup(RBTNode zNode) {
         if (zNode == nil || zNode == root) return;
 
         while (zNode != root && zNode.parent.color == RBTNode.red) {
             if (zNode.parent == zNode.parent.parent.left) {
+                // Der Elternknoten ist der linke Kindknoten des Großelternknotens
                 RBTNode yNode = zNode.parent.parent.right;
                 if (yNode.color == RBTNode.red) {
+                    // Fall 1: Der Onkelknoten ist rot
                     zNode.parent.color = RBTNode.black;
                     yNode.color = RBTNode.black;
                     zNode.parent.parent.color = RBTNode.red;
                     zNode = zNode.parent.parent;
                 } else {
+                    // Der Onkelknoten ist schwarz
                     if (zNode == zNode.parent.right) {
+                        // Fall 2: zNode ist rechtes Kind
                         zNode = zNode.parent;
                         leftRotate(zNode);
                     }
+                    // Fall 3: zNode ist linkes Kind
                     zNode.parent.color = RBTNode.black;
                     zNode.parent.parent.color = RBTNode.red;
                     rightRotate(zNode.parent.parent);
                 }
             } else {
+                // Der Elternknoten ist der rechte Kindknoten des Großelternknotens
                 RBTNode yNode = zNode.parent.parent.left;
                 if (yNode.color == RBTNode.red) {
+                    // Fall 1: Der Onkelknoten ist rot
                     zNode.parent.color = RBTNode.black;
                     yNode.color = RBTNode.black;
                     zNode.parent.parent.color = RBTNode.red;
                     zNode = zNode.parent.parent;
                 } else {
+                    // Der Onkelknoten ist schwarz
                     if (zNode == zNode.parent.left) {
+                        // Fall 2: zNode ist linkes Kind
                         zNode = zNode.parent;
-                        leftRotate(zNode);
+                        rightRotate(zNode); // Hier ist der Fehler - sollte rightRotate sein
                     }
+                    // Fall 3: zNode ist rechtes Kind
                     zNode.parent.color = RBTNode.black;
                     zNode.parent.parent.color = RBTNode.red;
-                    rightRotate(zNode.parent.parent);
+                    leftRotate(zNode.parent.parent);
                 }
             }
         }
         root.color = RBTNode.black;
+    }
+
+    public boolean checkBlackHeight() {
+        return getBlackHeight(root) != -1;
+    }
+
+    private int getBlackHeight(RBTNode node) {
+        if (node == nil) {
+            return 1; // NIL-Knoten zählt als schwarz
+        }
+
+        int leftBlackHeight = getBlackHeight(node.left);
+        int rightBlackHeight = getBlackHeight(node.right);
+
+        if (leftBlackHeight == -1 || rightBlackHeight == -1 || leftBlackHeight != rightBlackHeight) {
+            return -1; // Ungültiger Pfad
+        }
+
+        int increment = (node.color == RBTNode.black) ? 1 : 0;
+        return leftBlackHeight + increment;
+    }
+
+
+    public void hurtRBT() {
+        root.color = RBTNode.red;
+    }
+
+    public void hurtRBTChangeColors(int key) {
+        Boolean localNode = search(root, key).color;
+        if (localNode) {
+            search(root, key).color = RBTNode.black;
+        } else {
+            search(root, key).color = RBTNode.red;
+        }
     }
 }
 
