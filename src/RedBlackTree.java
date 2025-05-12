@@ -119,18 +119,18 @@ public class RedBlackTree {
 
     private int getBlackHeight(RBTNode node) {
         if (node == nil) {
-            return 1; // NIL-Knoten zählt als schwarz
+            return 1;
         }
 
         int leftBlackHeight = getBlackHeight(node.left);
         int rightBlackHeight = getBlackHeight(node.right);
 
         if (leftBlackHeight == -1 || rightBlackHeight == -1 || leftBlackHeight != rightBlackHeight) {
-            return -1; // Ungültiger Pfad
+            return -1;
         }
 
-        int increment = (node.color == RBTNode.black) ? 1 : 0;
-        return leftBlackHeight + increment;
+        int i = (node.color == RBTNode.black) ? 1 : 0;
+        return leftBlackHeight + i;
     }
 
     // hilfsmethode zur bestimmung roter knoten
