@@ -92,7 +92,7 @@ public class RedBlackTree {
 
      // claude.ai (Prompt: gib mir eine generelle Idee, wie ich überprüfen kann, ob ein schwarz roter baum ein schwarz roter baum ist)
     public boolean CheckRB() {
-        return CheckRB(root);
+        return CheckRB(root) && checkBlackHeight();
     }
 
     private boolean CheckRB(RBTNode node) {
@@ -110,7 +110,7 @@ public class RedBlackTree {
         if (!CheckRB(node.left) || !CheckRB(node.right))
             return false;
 
-        return checkBlackHeight();
+        return true;
     }
 
     public boolean checkBlackHeight() {
